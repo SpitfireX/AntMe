@@ -23,6 +23,11 @@ namespace AntMe.Player.TeamA
             bau = null;
         }
 
+        private double DegreeToRadian(double angle)
+        {
+            return Math.PI * angle / 180.0;
+        }
+
         /// <summary>
         /// Wenn die Ameise keinerlei Aufträge hat, wartet sie auf neue Aufgaben. Um dir das 
         /// mitzuteilen, wird diese Methode hier aufgerufen.
@@ -83,10 +88,10 @@ namespace AntMe.Player.TeamA
                 radius = Koordinate.BestimmeEntfernung(bau, ameise);
             }
 
-            x = (int)(radius * Math.Cos(winkel));
-            y = (int)(radius * Math.Sin(winkel));
+            x = (int)(radius * Math.Cos(DegreeToRadian(winkel)));
+            y = (int)(radius * Math.Sin(DegreeToRadian(winkel)));
 
-            //ameise.Denke(winkel + ", " + radius + "\n" + x + ", " + y);
+            ameise.Denke(winkel + ", " + radius + "\n" + x + ", " + y);
         }
 
         #endregion
