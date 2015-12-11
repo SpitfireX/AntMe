@@ -77,8 +77,11 @@ namespace AntMe.Player.TeamA
         /// </summary>
         public virtual void Tick()
         {
-            winkel = Koordinate.BestimmeRichtung(bau, ameise);
-            radius = Koordinate.BestimmeEntfernung(bau, ameise);
+            if (bau != null)
+            {
+                winkel = Koordinate.BestimmeRichtung(bau, ameise);
+                radius = Koordinate.BestimmeEntfernung(bau, ameise);
+            }
 
             x = (int)(radius * Math.Cos(winkel));
             y = (int)(radius * Math.Sin(winkel));
@@ -98,13 +101,13 @@ namespace AntMe.Player.TeamA
         /// <param name="obst">Das gesichtete Stück Obst</param>
         public virtual void Sieht(Obst obst)
         {
-            //if (ameise.AktuelleLast == 0)
-            //{
-            //    this.ziel = ameise.Ziel as Obst;
-            //    ameise.GeheZuZiel(ziel);
-            //}
-            //else
-            //    ameise.GeheZuZiel(bau);
+            if (ameise.AktuelleLast == 0)
+            {
+                this.ziel = obst;
+                ameise.GeheZuZiel(ziel);
+            }
+            else
+                ameise.GeheZuZiel(bau);
         }
 
         /// <summary>
@@ -133,16 +136,14 @@ namespace AntMe.Player.TeamA
         /// <param name="obst">Das erreichte Stück Obst</param>
         public virtual void ZielErreicht(Obst obst)
         {
-            //ameise.SprüheMarkierung(10, 30);
+            if (bau == null)
+            {
+                ameise.GeheZuBau();
+                bau = ameise.Ziel as Bau;
+            }
 
-            //if (bau == null)
-            //{
-            //    ameise.GeheZuBau();
-            //    bau = ameise.Ziel as Bau;
-            //}
-
-            //ameise.Nimm(obst);
-            //ameise.GeheZuZiel(bau);
+            ameise.Nimm(obst);
+            ameise.GeheZuZiel(bau);
         }
 
         /// <summary>

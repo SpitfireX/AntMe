@@ -26,7 +26,7 @@ namespace AntMe.Player.TeamA
     /// den Fähigkeiten einzelner Ameisen arbeiten. Wie genau das funktioniert kannst du der 
     /// Lektion zur Spezialisierung von Ameisen entnehmen (http://wiki.antme.net/de/Lektion7).
     [Kaste(
-        Name = "Standard",                  // Name der Berufsgruppe
+        Name = "Arbeiter",                  // Name der Berufsgruppe
         AngriffModifikator = 0,             // Angriffsstärke einer Ameise
         DrehgeschwindigkeitModifikator = 0, // Drehgeschwindigkeit einer Ameise
         EnergieModifikator = 0,             // Lebensenergie einer Ameise
@@ -36,17 +36,17 @@ namespace AntMe.Player.TeamA
         SichtweiteModifikator = 0           // Sichtweite einer Ameise
     )]
     [Kaste(
-        Name = "HelferObst",                  // Name der Berufsgruppe
+        Name = "Scout",                  // Name der Berufsgruppe
         AngriffModifikator = -1,             // Angriffsstärke einer Ameise
-        DrehgeschwindigkeitModifikator = -1, // Drehgeschwindigkeit einer Ameise
+        DrehgeschwindigkeitModifikator = 0, // Drehgeschwindigkeit einer Ameise
         EnergieModifikator = -1,             // Lebensenergie einer Ameise
-        GeschwindigkeitModifikator = 1,     // Laufgeschwindigkeit einer Ameise
-        LastModifikator = 1,                // Tragkraft einer Ameise
-        ReichweiteModifikator = 1,          // Ausdauer einer Ameise
-        SichtweiteModifikator = 0           // Sichtweite einer Ameise
+        GeschwindigkeitModifikator = 0,     // Laufgeschwindigkeit einer Ameise
+        LastModifikator = -1,                // Tragkraft einer Ameise
+        ReichweiteModifikator = +1,          // Ausdauer einer Ameise
+        SichtweiteModifikator = +2           // Sichtweite einer Ameise
     )]
     [Kaste(
-        Name = "HelferZucker",                  // Name der Berufsgruppe
+        Name = "Wache",                  // Name der Berufsgruppe
         AngriffModifikator = -1,             // Angriffsstärke einer Ameise
         DrehgeschwindigkeitModifikator = -1, // Drehgeschwindigkeit einer Ameise
         EnergieModifikator = -1,             // Lebensenergie einer Ameise
@@ -56,17 +56,7 @@ namespace AntMe.Player.TeamA
         SichtweiteModifikator = 0           // Sichtweite einer Ameise
     )]
     [Kaste(
-        Name = "KriegerObst",                  // Name der Berufsgruppe
-        AngriffModifikator = 1,             // Angriffsstärke einer Ameise
-        DrehgeschwindigkeitModifikator = -1, // Drehgeschwindigkeit einer Ameise
-        EnergieModifikator = 1,             // Lebensenergie einer Ameise
-        GeschwindigkeitModifikator = 0,     // Laufgeschwindigkeit einer Ameise
-        LastModifikator = 1,                // Tragkraft einer Ameise
-        ReichweiteModifikator = -1,          // Ausdauer einer Ameise
-        SichtweiteModifikator = -1           // Sichtweite einer Ameise
-    )]
-    [Kaste(
-        Name = "KriegerZucker",                  // Name der Berufsgruppe
+        Name = "Krieger",                  // Name der Berufsgruppe
         AngriffModifikator = 1,             // Angriffsstärke einer Ameise
         DrehgeschwindigkeitModifikator = -1, // Drehgeschwindigkeit einer Ameise
         EnergieModifikator = 1,             // Lebensenergie einer Ameise
@@ -92,26 +82,32 @@ namespace AntMe.Player.TeamA
         /// <returns>Name der Kaste zu der die geborene Ameise gehören soll</returns>
         public override string BestimmeKaste(Dictionary<string, int> anzahl)
         {
-            if (anzahl["KriegerObst"] < 31)
+            int gesamtzahl = anzahl.Sum(x => x.Value);
+            string output = "";
+
+            if (gesamtzahl % 10 == 0)
             {
-                ich = new KriegerObst(this);
-                return "KriegerObst";
+                output = "Scout";
+                ich = new Scout(this);
             }
-            else if (anzahl["HelferObst"] < 31)
+            else if (gesamtzahl % 10 == 1)
             {
-                ich = new HelferObst(this);
-                return "HelferObst";
+                output = "Wache";
+                ich = new Wache(this);
             }
-            else if (anzahl["KriegerZucker"] < 21)
+            else if (gesamtzahl % 10 == 2 || gesamtzahl % 10 == 3)
             {
-                ich = new KriegerZucker(this);
-                return "KriegerZucker";
+                output = "Krieger";
+                ich = new Krieger(this);
             }
             else
             {
-                ich = new HelferZucker(this);
-                return "HelferZucker";                                                                                                                                                         
+                output = "Arbeiter";
+                ich = new Arbeiter(this);
             }
+
+            return output;
+
         }
 
         #endregion

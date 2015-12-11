@@ -5,13 +5,13 @@ using System.Text;
 
 namespace AntMe.Player.TeamA
 {
-    class KriegerZucker : Krieger
+    class Wache : MeineAmeise
     {
-        public KriegerZucker(TeamAKlasse ameise) : base(ameise) { }
+        public Wache(TeamAKlasse ameise) : base(ameise) { }
 
         public override string ToString()
         {
-            return base.ToString() + "Zucker";
+            return "Wache";
         }
     }
 }

@@ -49,12 +49,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helfer.cs" />
-    <Compile Include="HelferObst.cs" />
-    <Compile Include="HelferZucker.cs" />
+    <Compile Include="Wache.cs" />
     <Compile Include="Krieger.cs" />
-    <Compile Include="KriegerObst.cs" />
-    <Compile Include="KriegerZucker.cs" />
+    <Compile Include="Scout.cs" />
+    <Compile Include="Arbeiter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MeineAmeise.cs" />
     <Compile Include="TeamAKlasse.cs" />
