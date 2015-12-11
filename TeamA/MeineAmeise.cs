@@ -8,9 +8,11 @@ namespace AntMe.Player.TeamA
 {
     class MeineAmeise
     {
-        Bau bau;
+        protected Bau bau;
         protected Spielobjekt ziel;
         protected TeamAKlasse ameise;
+
+        protected int radius, winkel, x, y;
 
         #region Kasten
         public MeineAmeise(TeamAKlasse ameise)
@@ -20,8 +22,6 @@ namespace AntMe.Player.TeamA
             bau = null;
         }
 
-
-
         /// <summary>
         /// Wenn die Ameise keinerlei Aufträge hat, wartet sie auf neue Aufgaben. Um dir das 
         /// mitzuteilen, wird diese Methode hier aufgerufen.
@@ -29,6 +29,13 @@ namespace AntMe.Player.TeamA
         /// </summary>
         public virtual void Wartet()
         {
+            if (bau == null)
+            {
+                ameise.GeheZuBau();
+                bau = (Bau)ameise.Ziel;
+                ameise.BleibStehen();
+            }
+
             if (ziel != null)
                 ameise.GeheZuZiel(ziel);
             else
@@ -62,11 +69,13 @@ namespace AntMe.Player.TeamA
         /// </summary>
         public virtual void Tick()
         {
-            //if (traegt != null)
-            //{
-            //    if (BrauchtNochTräger(traegt))
-            //        SprüheMarkierung(10, 70);
-            //}
+            winkel = Koordinate.BestimmeRichtung(bau, ameise);
+            radius = Koordinate.BestimmeEntfernung(bau, ameise);
+
+            x = (int)(radius * Math.Cos(winkel));
+            y = (int)(radius * Math.Sin(winkel));
+
+            ameise.Denke(winkel + ", " + radius + "\n" + x + ", " + y);
         }
 
         #endregion
