@@ -13,6 +13,7 @@ namespace AntMe.Player.TeamA
         protected TeamAKlasse ameise;
 
         protected int radius, winkel, x, y;
+        protected bool wanze;
 
         #region Kasten
         public MeineAmeise(TeamAKlasse ameise)
@@ -36,10 +37,17 @@ namespace AntMe.Player.TeamA
                 ameise.BleibStehen();
             }
 
-            if (ziel != null)
-                ameise.GeheZuZiel(ziel);
+            if (wanze)
+            {
+                wanze = false;
+            }
             else
-                ameise.GeheGeradeaus();
+            {
+                if (ziel != null)
+                    ameise.GeheZuZiel(ziel);
+                else
+                    ameise.GeheGeradeaus();
+            }
         }
 
         /// <summary>
@@ -75,7 +83,7 @@ namespace AntMe.Player.TeamA
             x = (int)(radius * Math.Cos(winkel));
             y = (int)(radius * Math.Sin(winkel));
 
-            ameise.Denke(winkel + ", " + radius + "\n" + x + ", " + y);
+            //ameise.Denke(winkel + ", " + radius + "\n" + x + ", " + y);
         }
 
         #endregion
@@ -217,6 +225,14 @@ namespace AntMe.Player.TeamA
         /// <param name="wanze">Erspähte Wanze</param>
         public virtual void SiehtFeind(Wanze wanze)
         {
+            int abstand = Koordinate.BestimmeEntfernung(ameise, wanze);
+            ameise.Denke(abstand.ToString());
+
+            if (abstand <= 10)
+            {
+                ameise.BleibStehen();
+                this.wanze = true;
+            }
         }
 
         /// <summary>
