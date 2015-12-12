@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MeinZiel.cs" />
     <Compile Include="Wache.cs" />
     <Compile Include="Krieger.cs" />
     <Compile Include="Scout.cs" />
