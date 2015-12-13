@@ -34,10 +34,6 @@ namespace AntMe.Player.TeamA
         {
             BestimmeKoordinaten();
 
-            int winkel = 0;
-            if (ich != null && bau != null)
-                winkel = Koordinate.BestimmeRichtung(ich, bau);
-
             switch (state)
             {
                 case "GeheHeim":
@@ -92,13 +88,10 @@ namespace AntMe.Player.TeamA
                     }
                     break;
                 case "Angriff":
-                    if (ich != null && ziel != null)
-                    {
-                        if (Koordinate.BestimmeEntfernung(ich, ziel) <= ich.Sichtweite / 2)
+                        if (ziel != null && Koordinate.BestimmeEntfernung(ich, ziel) <= ich.Sichtweite / 2)
                             ich.GreifeAn(ziel);
                         else
                             state = "GeheHeim";
-                    }
                     break;
             }
 

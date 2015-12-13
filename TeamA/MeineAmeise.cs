@@ -126,6 +126,7 @@ namespace AntMe.Player.TeamA
 
         protected void GeheZuBauOpt()
         {
+            BestimmeBau();
             text = "Gehe zum Bau!";
             int distanz = Koordinate.BestimmeEntfernung(ich, bau);
             int winkel = Koordinate.BestimmeRichtung(ich, bau);
