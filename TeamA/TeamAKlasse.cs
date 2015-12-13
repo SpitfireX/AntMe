@@ -47,12 +47,12 @@ namespace AntMe.Player.TeamA
     )]
     [Kaste(
         Name = "Wache",                  // Name der Berufsgruppe
-        AngriffModifikator = -1,             // Angriffsstärke einer Ameise
-        DrehgeschwindigkeitModifikator = -1, // Drehgeschwindigkeit einer Ameise
-        EnergieModifikator = -1,             // Lebensenergie einer Ameise
-        GeschwindigkeitModifikator = 2,     // Laufgeschwindigkeit einer Ameise
-        LastModifikator = 1,                // Tragkraft einer Ameise
-        ReichweiteModifikator = 0,          // Ausdauer einer Ameise
+        AngriffModifikator = 1,             // Angriffsstärke einer Ameise
+        DrehgeschwindigkeitModifikator = 0, // Drehgeschwindigkeit einer Ameise
+        EnergieModifikator = 1,             // Lebensenergie einer Ameise
+        GeschwindigkeitModifikator = 0,     // Laufgeschwindigkeit einer Ameise
+        LastModifikator = -1,                // Tragkraft einer Ameise
+        ReichweiteModifikator = -1,          // Ausdauer einer Ameise
         SichtweiteModifikator = 0           // Sichtweite einer Ameise
     )]
     [Kaste(
