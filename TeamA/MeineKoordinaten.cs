@@ -13,7 +13,7 @@ namespace AntMe.Player.TeamA
         public MeineKoordinaten(int dist, int wink)
         {
             X = (int)(dist * Math.Cos(Math.PI * wink / 180.0));
-            Y = (int)(wink * Math.Sin(Math.PI * wink / 180.0));
+            Y = (int)(dist * Math.Sin(Math.PI * wink / 180.0));
         }
 
         public MeineKoordinaten(int information)
@@ -24,6 +24,18 @@ namespace AntMe.Player.TeamA
             Y = y * 6;
         }
 
+        public MeineKoordinaten(MeineKoordinaten k)
+        {
+            X = k.X;
+            Y = k.Y;
+        }
+
+        public MeineKoordinaten(MeineKoordinaten start, MeineKoordinaten ziel)
+        {
+            X = ziel.X - start.X;
+            Y = ziel.Y - start.Y;
+        }
+
         /// <summary>
         /// bestimmt die neue aktuelle Position aus den Polarkoordinaten
         /// </summary>
@@ -32,7 +44,24 @@ namespace AntMe.Player.TeamA
         public void SetzeNeueKoordinaten(int dist, int wink)
         {
             X = (int)(dist * Math.Cos(Math.PI * wink / 180.0));
-            Y = (int)(wink * Math.Sin(Math.PI * wink / 180.0));
-        }        
+            Y = (int)(dist * Math.Sin(Math.PI * wink / 180.0));
+        }  
+        
+        public double BestimmeBetrag()
+        {
+            return Math.Sqrt((X * X) + (Y * Y));
+        }
+
+        public int BestimmeRichtung()
+        {
+            if (Y < 0)
+            {
+                return (int)((-Math.Acos(X / BestimmeBetrag())*180)/Math.PI);
+            }
+            else
+            {
+                return (int)((Math.Acos(X / BestimmeBetrag())*180)/Math.PI);
+            }
+        }      
     }
 }

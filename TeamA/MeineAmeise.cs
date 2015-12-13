@@ -8,24 +8,19 @@ namespace AntMe.Player.TeamA
 {
     class MeineAmeise
     {
-        protected Bau bau;
-        protected Spielobjekt ziel;
-        protected TeamAKlasse ameise;
-
-        protected int radius, winkel, x, y;
-        protected bool wanze;
+        protected Bau bau;                                  // Referenz auf den Ameisenbau
+        protected TeamAKlasse ich;                          // aktuelle Ameise
+        protected MeineKoordinaten meinePosition;           // aktuelle Koordinaten
+        protected MeinZiel aktuellesZiel;                   // Aktuelles Ziel der Ameise
+        protected bool sollWarten = false;
+        protected bool sollZuZiel = true;
+        private string text;
 
         #region Kasten
         public MeineAmeise(TeamAKlasse ameise)
         {
-            this.ameise = ameise;
-            ziel = null;
+            ich = ameise;
             bau = null;
-        }
-
-        private double DegreeToRadian(double angle)
-        {
-            return Math.PI * angle / 180.0;
         }
 
         /// <summary>
@@ -35,23 +30,37 @@ namespace AntMe.Player.TeamA
         /// </summary>
         public virtual void Wartet()
         {
+            text = "Ich warte!";
+            if (ich.AktuelleLast == 0)
+                sollZuZiel = true;
+
             if (bau == null)
             {
-                ameise.GeheZuBau();
-                bau = (Bau)ameise.Ziel;
-                ameise.BleibStehen();
-            }
-
-            if (wanze)
-            {
-                wanze = false;
-            }
-            else
-            {
-                if (ziel != null)
-                    ameise.GeheZuZiel(ziel);
+                ich.GeheZuBau();
+                bau = (Bau)ich.Ziel;
+                ich.BleibStehen();
+                int winkel = Koordinate.BestimmeRichtung(bau, ich);
+                int radius = Koordinate.BestimmeEntfernung(bau, ich);
+                if (meinePosition == null)
+                    this.meinePosition = new MeineKoordinaten(radius, winkel);
                 else
-                    ameise.GeheGeradeaus();
+                {
+                    this.meinePosition.SetzeNeueKoordinaten(radius, winkel);
+                }
+            }
+            if (!sollWarten)
+            {
+                if (aktuellesZiel == null)
+                {
+                    ich.GeheGeradeaus();
+                }
+                else
+                {
+                    if (ich.AktuelleLast != 0)
+                        ich.GeheZuBau();
+                    else
+                        GeheZuZielOpt();
+                }
             }
         }
 
@@ -84,14 +93,79 @@ namespace AntMe.Player.TeamA
         {
             if (bau != null)
             {
-                winkel = Koordinate.BestimmeRichtung(bau, ameise);
-                radius = Koordinate.BestimmeEntfernung(bau, ameise);
+                int winkel = Koordinate.BestimmeRichtung(bau, ich);
+                int radius = Koordinate.BestimmeEntfernung(bau, ich);
+                if (meinePosition == null)
+                    this.meinePosition = new MeineKoordinaten(radius, winkel);
+                else
+                {
+                    this.meinePosition.SetzeNeueKoordinaten(radius, winkel);
+                }
             }
 
-            x = (int)(radius * Math.Cos(DegreeToRadian(winkel)));
-            y = (int)(radius * Math.Sin(DegreeToRadian(winkel)));
+            
+            if (aktuellesZiel != null && aktuellesZiel.Gegenstand != null)
+            {
+                ich.Denke(String.Format("Sprühe: ({0}, {1})",aktuellesZiel.Koordinaten.X, aktuellesZiel.Koordinaten.Y));
+                ich.SprüheMarkierung(aktuellesZiel.InformationKodieren());
+            } else if (aktuellesZiel != null && aktuellesZiel.Gegenstand == null)
+                ich.Denke(String.Format("Rieche: ({0}, {1})", aktuellesZiel.Koordinaten.X, aktuellesZiel.Koordinaten.Y));
 
-            ameise.Denke(winkel + ", " + radius + "\n" + x + ", " + y);
+            //if (hatZiel)
+            //    ameise.GeheGeradeaus();
+
+            //if ((aktuellesZiel != null) && (Koordinate.BestimmeEntfernung(aktuellesZiel, ameise) < 30))
+            //{
+            //    ameise.GeheZuZiel(aktuellesZiel);
+            //}
+            //ameise.Denke(winkel + ", " + radius + "\n" + x + ", " + y);
+        }
+
+        protected void GeheZuBauOpt()
+        {
+            text = "Gehe zum Bau!";
+            int distanz = Koordinate.BestimmeEntfernung(ich, bau);
+            int winkel = Koordinate.BestimmeRichtung(ich, bau);
+            ich.DreheInRichtung(winkel);
+            if (distanz < ich.Sichtweite)
+                ich.GeheZuBau();
+            else
+                ich.GeheGeradeaus(distanz);
+        }
+
+        protected void GeheZuZielOpt()
+        {
+            int distanz = 0, winkel = 0;
+            text = "Gehe zum Ziel!";
+            if (aktuellesZiel.Gegenstand == null)
+            {
+                MeineKoordinaten tmp = aktuellesZiel.BestimmeRichtung(meinePosition);
+                distanz = (int)tmp.BestimmeBetrag();
+                winkel = tmp.BestimmeRichtung();
+            }
+            else {
+                distanz = Koordinate.BestimmeEntfernung(ich, aktuellesZiel.Gegenstand);
+                winkel = Koordinate.BestimmeRichtung(ich, aktuellesZiel.Gegenstand);
+            }
+            ich.DreheInRichtung(winkel);
+            if (distanz < ich.Sichtweite)
+                if (this.aktuellesZiel.Gegenstand == null)
+                    ich.GeheGeradeaus();
+                else
+                    ich.GeheZuZiel(this.aktuellesZiel.Gegenstand);
+            else
+                ich.GeheGeradeaus();
+        }
+
+        protected void GeheZuKoordinate(MeinZiel ziel)
+        {
+            //text = String.Format("Iche gehe zu Koordinate ({0},{1})!", ziel.Koordinaten.X, ziel.Koordinaten.Y);
+            //int richtung = ziel.bestimmeRichtung(this.meinePosition);
+            //if (richtung != ich.Richtung)
+            //{
+            //    ich.DreheInRichtung(richtung);
+            //}
+            //ich.GeheGeradeaus();
         }
 
         #endregion
@@ -106,13 +180,13 @@ namespace AntMe.Player.TeamA
         /// <param name="obst">Das gesichtete Stück Obst</param>
         public virtual void Sieht(Obst obst)
         {
-            if (ameise.AktuelleLast == 0)
-            {
-                this.ziel = obst;
-                ameise.GeheZuZiel(ziel);
-            }
-            else
-                ameise.GeheZuZiel(bau);
+            //if (ameise.AktuelleLast == 0)
+            //{
+            //    myziel.ziel = obst;
+            //    GeheZuZielOpt();
+            //}
+            //else
+            //    GeheZuBauOpt();
         }
 
         /// <summary>
@@ -123,13 +197,14 @@ namespace AntMe.Player.TeamA
         /// <param name="zucker">Der gesichtete Zuckerhügel</param>
         public virtual void Sieht(Zucker zucker)
         {
-            if (ameise.AktuelleLast == 0)
+            if (sollZuZiel)
             {
-                this.ziel = zucker;
-                ameise.GeheZuZiel(ziel);
+                MeineKoordinaten ziel = new MeineKoordinaten(Koordinate.BestimmeEntfernung(bau, zucker), Koordinate.BestimmeRichtung(bau, zucker));
+                aktuellesZiel = new MeinZiel(zucker, ziel);
+                GeheZuZielOpt();
             }
             else
-                ameise.GeheZuZiel(bau);
+                GeheZuBauOpt();
         }
 
         /// <summary>
@@ -141,14 +216,14 @@ namespace AntMe.Player.TeamA
         /// <param name="obst">Das erreichte Stück Obst</param>
         public virtual void ZielErreicht(Obst obst)
         {
-            if (bau == null)
-            {
-                ameise.GeheZuBau();
-                bau = ameise.Ziel as Bau;
-            }
-
-            ameise.Nimm(obst);
-            ameise.GeheZuZiel(bau);
+            //if (bau == null)
+            //{
+            //    ameise.GeheZuBau();
+            //    bau = ameise.Ziel as Bau;
+            //}
+            
+            //ameise.Nimm(obst);
+            //GeheZuBauOpt();
         }
 
         /// <summary>
@@ -160,13 +235,10 @@ namespace AntMe.Player.TeamA
         /// <param name="zucker">Der erreichte Zuckerhügel</param>
         public virtual void ZielErreicht(Zucker zucker)
         {
-            ameise.Nimm(zucker);
-            if (bau == null)
-            {
-                ameise.GeheZuBau();
-                bau = ameise.Ziel as Bau;
-            }
-            ameise.GeheZuZiel(bau);
+
+            ich.Nimm(zucker);
+            sollZuZiel = false;
+            GeheZuBauOpt();
         }
 
         #endregion
@@ -182,8 +254,12 @@ namespace AntMe.Player.TeamA
         /// <param name="markierung">Die gerochene Markierung</param>
         public virtual void RiechtFreund(Markierung markierung)
         {
-            //if (markierung.Information == 10 && ameise.AktuelleLast == 0)
-            //    ameise.GeheZuZiel(markierung);
+            MeineKoordinaten k = new MeineKoordinaten(markierung.Information);
+            if (aktuellesZiel == null)
+            {
+                aktuellesZiel = new MeinZiel(k);
+                
+            }
         }
 
         /// <summary>
@@ -195,6 +271,15 @@ namespace AntMe.Player.TeamA
         /// <param name="ameise">Erspähte befreundete Ameise</param>
         public virtual void SiehtFreund(Ameise ameise)
         {
+            //if (freund == null)
+            //{
+            //    if (ameise.AktuelleLast != 0 && this.ameise.AktuelleLast == 0)
+            //    {
+            //        aktuellesZiel = ameise;
+            //        freund = ameise;
+            //        freundID = ameise.Id;
+            //    }
+            //}
         }
 
         /// <summary>
@@ -231,14 +316,14 @@ namespace AntMe.Player.TeamA
         /// <param name="wanze">Erspähte Wanze</param>
         public virtual void SiehtFeind(Wanze wanze)
         {
-            int abstand = Koordinate.BestimmeEntfernung(ameise, wanze);
-            ameise.Denke(abstand.ToString());
+            //int abstand = Koordinate.BestimmeEntfernung(ameise, wanze);
+            //ameise.Denke(abstand.ToString());
 
-            if (abstand <= 10)
-            {
-                ameise.BleibStehen();
-                this.wanze = true;
-            }
+            //if (abstand <= 10)
+            //{
+            //    ameise.BleibStehen();
+            //    this.wanze = true;
+            //}
         }
 
         /// <summary>
