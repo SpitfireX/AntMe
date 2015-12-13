@@ -14,7 +14,7 @@ namespace AntMe.Player.TeamA
         protected MeinZiel aktuellesZiel;                   // Aktuelles Ziel der Ameise
         protected bool sollWarten = false;
         protected bool sollZuZiel = true;
-        private string text;
+        protected string text;
 
         #region Kasten
         public MeineAmeise(TeamAKlasse ameise)
@@ -34,20 +34,8 @@ namespace AntMe.Player.TeamA
             if (ich.AktuelleLast == 0)
                 sollZuZiel = true;
 
-            if (bau == null)
-            {
-                ich.GeheZuBau();
-                bau = (Bau)ich.Ziel;
-                ich.BleibStehen();
-                int winkel = Koordinate.BestimmeRichtung(bau, ich);
-                int radius = Koordinate.BestimmeEntfernung(bau, ich);
-                if (meinePosition == null)
-                    this.meinePosition = new MeineKoordinaten(radius, winkel);
-                else
-                {
-                    this.meinePosition.SetzeNeueKoordinaten(radius, winkel);
-                }
-            }
+            BestimmeBau();
+
             if (!sollWarten)
             {
                 if (aktuellesZiel == null)
@@ -60,6 +48,32 @@ namespace AntMe.Player.TeamA
                         ich.GeheZuBau();
                     else
                         GeheZuZielOpt();
+                }
+            }
+        }
+
+        public void BestimmeBau()
+        {
+            if (bau == null)
+            {
+                ich.GeheZuBau();
+                bau = (Bau)ich.Ziel;
+                ich.BleibStehen();
+                BestimmeKoordinaten();
+            }
+        }
+
+        public void BestimmeKoordinaten()
+        {
+            if (bau != null)
+            {
+                int winkel = Koordinate.BestimmeRichtung(bau, ich);
+                int radius = Koordinate.BestimmeEntfernung(bau, ich);
+                if (meinePosition == null)
+                    this.meinePosition = new MeineKoordinaten(radius, winkel);
+                else
+                {
+                    this.meinePosition.SetzeNeueKoordinaten(radius, winkel);
                 }
             }
         }
@@ -91,19 +105,8 @@ namespace AntMe.Player.TeamA
         /// </summary>
         public virtual void Tick()
         {
-            if (bau != null)
-            {
-                int winkel = Koordinate.BestimmeRichtung(bau, ich);
-                int radius = Koordinate.BestimmeEntfernung(bau, ich);
-                if (meinePosition == null)
-                    this.meinePosition = new MeineKoordinaten(radius, winkel);
-                else
-                {
-                    this.meinePosition.SetzeNeueKoordinaten(radius, winkel);
-                }
-            }
+            BestimmeKoordinaten();
 
-            
             if (aktuellesZiel != null && aktuellesZiel.Gegenstand != null)
             {
                 ich.Denke(String.Format("Sprühe: ({0}, {1})",aktuellesZiel.Koordinaten.X, aktuellesZiel.Koordinaten.Y));
@@ -257,8 +260,7 @@ namespace AntMe.Player.TeamA
             MeineKoordinaten k = new MeineKoordinaten(markierung.Information);
             if (aktuellesZiel == null)
             {
-                aktuellesZiel = new MeinZiel(k);
-                
+                aktuellesZiel = new MeinZiel(k);      
             }
         }
 
